@@ -1,0 +1,197 @@
+RNAformer:
+  _stack_target_: RNAformer.model_stack.joint_riboformer_stack.JointRiboFormerStack
+  _target_: RNAformer.model.riboformer.RiboFormer
+  cycling: 6
+  decoder_head: true
+  embed_dropout: 0.1
+  ff_factor: 4
+  ff_kernel: 3
+  flash_attn: true
+  gating: false
+  head_bias: false
+  independent: true
+  initializer_range: 0.02
+  key_dim_scaler: true
+  ln_eps: 1.0e-05
+  max_len: 0
+  model_dim: 256
+  model_type: encoder
+  n_layers: 6
+  num_head: 4
+  partial: false
+  post_attention: false
+  post_factor: 1.0
+  post_feed_forward: false
+  precision: bf16
+  prob_layer: middle
+  probabilistic: false
+  rel_pos_enc: true
+  resi_dropout: 0.1
+  seq_vocab_size: 0
+  shared_embedding: false
+  softmax_scale: true
+  softplus: false
+  trg_vocab_size: 0
+  use_bias: true
+  use_glu: false
+  z_factor: 0.25
+  zero_init: false
+callbacks:
+  learning_rate_monitor:
+    _target_: pytorch_lightning.callbacks.LearningRateMonitor
+    logging_interval: step
+  log_gradient:
+    _target_: RNAformer.utils.callbacks.log_gradient.LogParamsAndGrads
+    log_every_n_steps: 100
+    log_gradient: true
+    log_params: true
+  model_checkpoint:
+    _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    auto_insert_metric_name: false
+    dirpath: /home/ubuntu/tmp/experiments/
+    every_n_epochs: null
+    every_n_train_steps: 10000
+    filename: checkpoint-{epoch:02d}-{global_step}
+    mode: max
+    monitor: step
+    save_last: true
+    save_top_k: 1
+deepspeed:
+  allgather_bucket_size: 500000000
+  contiguous_gradients: false
+  initial_scale_power: 16
+  overlap_comm: true
+  reduce_bucket_size: 500000000
+  stage: 2
+  zero_allow_untested_optimizer: true
+  zero_optimization: true
+experiment:
+  experiment_name: riboP_sALL_i5_o1_100k_bf16_c6_ri5_8x600_lr001cos_256_6_s1_aws1
+  experiments_base_dir: /home/ubuntu/tmp/experiments/
+  project_name: riboformer
+  session_name: rna_folding_comp_bio_06_tsS2
+lm_data:
+  batch_size: 32
+  cache_dir: /disk/cache/lm_data
+  data_dir: /disk/data/lm_data
+  dataset_name: openwebtext
+  evaluation_sets:
+  - wikitext
+  - lambada
+  - ptb
+  max_sample_len: 1024
+  neg_samples: false
+  num_cpu_worker: 32
+  num_gpu_worker: 8
+  seed: 1
+  val_ratio: 0.0005
+  val_split_seed: 2357
+logger:
+  tensorboard:
+    _target_: pytorch_lightning.loggers.tensorboard.TensorBoardLogger
+    default_hp_metric: true
+    log_graph: false
+    name: ''
+    prefix: ''
+    save_dir: tensorboard/
+    version: tb
+resume_training: false
+rna_data:
+  batch_by_token_size: true
+  batch_size: 1
+  batch_token_size: 600
+  cache_dir: /home/ubuntu/tmp/data/cache
+  dataframe_path: /home/ubuntu/tmp/data/synthetic_data_all_conform_final.plk
+  design: false
+  max_len: 200
+  min_len: 10
+  num_cpu_worker: 32
+  num_gpu_worker: 8
+  oversample_pdb: 1
+  partial_training: false
+  predict_canonical: false
+  random_ignore_mat: 0.5
+  seed: 123
+  shuffle_pool_size: 100
+  similarity: 80
+  test_sets:
+  - bprna_ts0
+  - pdb_ts1
+  - pdb_ts2
+  - pdb_ts3
+  - pdb_ts_hard
+  valid_sets:
+  - bprna_ts0
+  - bprna_vl0
+  - pdb_ts1
+  - pdb_ts2
+  - pdb_ts3
+  - pdb_ts_hard
+  - pdb_vl1
+task: rna_folding
+toy_data:
+  inference_steps: 50
+  max_len: 45
+  min_len: 15
+  n_sentence: 100
+  sample_amount: 100000
+  seed: 100
+  sentence_len: 3
+  sentence_variations: 10
+  vocab_size: 50
+train:
+  geco:
+    independent: true
+    kappa: 0.01
+    kappa_annealing: true
+    kl_norm: true
+    kl_swap_dist: false
+    lagmul_rate: 0.1
+    lamd_softplus: true
+    ma_decay: 0.98
+  loss_fn:
+    inplace_backward: true
+  neg_samples: false
+  optimizer:
+    _target_: apex.optimizers.FusedAdam
+    adam_w_mode: true
+    betas:
+    - 0.9
+    - 0.98
+    eps: 1.0e-09
+    lr: 0.001
+    scheduler_mult_factor: null
+    seed: 1234
+    weight_decay: 0.1
+  optimizer_param_grouping:
+    bias_weight_decay: false
+    normalization_weight_decay: false
+  scheduler:
+    decay_factor: 0.01
+    num_training_steps: 100000
+    num_warmup_steps: 2000
+    schedule: cosine
+  seed: 1
+  softmax_temp: false
+trainer:
+  accelerator: gpu
+  check_val_every_n_epoch: null
+  default_root_dir: /home/ubuntu/workspace/
+  devices: 8
+  enable_checkpointing: true
+  enable_model_summary: true
+  enable_progress_bar: true
+  gradient_clip_val: 1.0
+  limit_train_batches: null
+  limit_val_batches: null
+  log_every_n_steps: 100
+  max_epochs: null
+  max_steps: 100000
+  num_nodes: 20
+  num_sanity_val_steps: 2
+  precision: bf16
+  reload_dataloaders_every_n_epochs: 1
+  replace_sampler_ddp: false
+  resume_from_checkpoint: null
+  track_grad_norm: -1
+  val_check_interval: 5000

@@ -10,6 +10,7 @@
 *.xml
 /build
 /dist
-/models
+# /models
 /datasets
 *RNAformer.egg-info
+/flash-attention
